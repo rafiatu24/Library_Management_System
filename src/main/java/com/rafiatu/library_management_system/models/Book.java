@@ -2,35 +2,29 @@ package com.rafiatu.library_management_system.models;
 
 //import jdk.internal.icu.text.UTF16;
 
-import java.time.LocalDate;
+import com.rafiatu.library_management_system.config.Database;
+import com.rafiatu.library_management_system.config.Util;
 
-public class Book {
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.util.*;
+
+public class Book extends Model{
 
 //    public static UTF16 Genre;
-    private int bookId;
+    private int id;
     private String title;
     private String author;
     private String genre;
     private boolean available;
 
-    public Book(int bookId, String title, String genre, String author, boolean available) {
-        this.bookId = bookId;
-        this.title = title;
-        this.genre = genre;
-        this.author = author;
-        this.available = available;
+    public Book() throws SQLException {
     }
 
-    public Book() {
-
-    }
-
-    public int getBookId() {
-        return bookId;
-    }
-
-    public void setBookId(int bookId) {
-        this.bookId = bookId;
+    public int getId() {
+        return id;
     }
 
     public String getTitle() {
@@ -41,20 +35,20 @@ public class Book {
         this.title = title;
     }
 
-    public String getGenre() {
-        return genre;
-    }
-
-    public void setGenre(String genre) {
-        this.genre = genre;
-    }
-
     public String getAuthor() {
         return author;
     }
 
     public void setAuthor(String author) {
         this.author = author;
+    }
+
+    public String getGenre() {
+        return genre;
+    }
+
+    public void setGenre(String genre) {
+        this.genre = genre;
     }
 
     public boolean isAvailable() {
@@ -65,35 +59,37 @@ public class Book {
         this.available = available;
     }
 
-    public void setPublicationDate(LocalDate publicationDate) {
-    }
+    public boolean save(){
+        String sql = "INSERT INTO books (title, author, genre) VALUES (?, ?, ?)";
 
-    public void setResourceId(int resourceId) {
-    }
-
-    public void setIsbn(String isbn) {
-    }
-
-
-    // Subclass for books
-    public static class book extends LibraryResource {
-        private String author;
-
-        public book(int resourceId, String title, String author) {
-            super(resourceId, title);
-            this.author = author;
+        try (PreparedStatement statement = Database.getConnection().prepareStatement(sql)) {
+            statement.setString(1, title);
+            statement.setString(2, author);
+            statement.setString(3, genre);
+            statement.execute();
+            System.out.println("Book added successfully");
+            return true;
+        } catch (Exception e) {
+            System.err.println("Error while adding book: " + e.getMessage());
         }
-
-        public String getAuthor() {
-            return author;
-        }
-
-        @Override
-        public void displayInfo() {
-            super.displayInfo();
-            System.out.println("Author: " + author);
-        }
+        return false;
     }
+
+    public static String[][] getAvailableBooks() throws SQLException {
+        ArrayList<ArrayList<String>> availableBooks = new ArrayList<ArrayList<String>>();
+        String sql = "SELECT * FROM books WHERE available=true";
+        try (PreparedStatement statement = Database.getConnection().prepareStatement(sql)) {
+            ResultSet result = statement.executeQuery();
+            while(result.next()){
+                availableBooks.add(new ArrayList<String>(Arrays.asList(
+                        result.getString("title"), result.getString("author"), result.getString("genre"), result.getString("id") // extra space for action button
+                )));
+            }
+        }
+        return Util.convert(availableBooks);
+    }
+
+
 }
 
 

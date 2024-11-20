@@ -17,7 +17,7 @@ public class Database {
 
     public static Connection getConnection() throws SQLException {
         if (connection == null) {
-            String dbUrl = "jdbc:postgresql://localhost:5432/library_db";
+            String dbUrl = "jdbc:postgresql://localhost:5432/postgres";
             String dbUser = "postgres";
             String dbPassword = "123456789";
             connection = DriverManager.getConnection(dbUrl, dbUser, dbPassword);

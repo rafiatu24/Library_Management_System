@@ -100,6 +100,7 @@ public class LoginForm {
 
     private void clear() {
         this.email.setText("");
+        //fixme: does not clear password input
         this.password.setText("");
     }
 

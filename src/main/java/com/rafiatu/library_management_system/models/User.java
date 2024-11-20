@@ -2,11 +2,14 @@ package com.rafiatu.library_management_system.models;
 
 import com.rafiatu.library_management_system.config.Auth;
 import com.rafiatu.library_management_system.config.Database;
+import com.rafiatu.library_management_system.config.Util;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class User extends Model{
     private static String table = "users";
@@ -14,8 +17,33 @@ public class User extends Model{
     private String username;
     private String password;
     private String email;
+    private boolean is_patron = false;
 
     public User() throws SQLException {
+    }
+
+    public static String[][] getPatrons() {
+        ArrayList<ArrayList<String>> patrons = new ArrayList<ArrayList<String>>();
+        String sql = "SELECT * FROM users WHERE is_patron = true";
+        try (PreparedStatement statement = Database.getConnection().prepareStatement(sql)) {
+            ResultSet result = statement.executeQuery();
+            while (result.next()) {
+                patrons.add(new ArrayList<String>(Arrays.asList(
+                        result.getString("username"), result.getString("email")
+                )));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting patrons: " + e.getMessage());
+        }
+        return Util.convert(patrons);
+    }
+
+    public boolean is_patron() {
+        return is_patron;
+    }
+
+    public void setIs_patron(boolean is_patron) {
+        this.is_patron = is_patron;
     }
 
     public int getId() {
@@ -47,13 +75,17 @@ public class User extends Model{
     }
 
     public boolean save(){
-        String sql = "INSERT INTO " + table + " (username, password, email) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO " + table + " (username, password, email, is_patron) VALUES (?, ?, ?, ?)";
 
         try (PreparedStatement statement = Database.getConnection().prepareStatement(sql)) {
             statement.setString(1, username);
             statement.setString(2, password);
             statement.setString(3, email);
+            statement.setBoolean(4, is_patron);
             statement.execute();
+            Auth.email = email;
+            Auth.username = username;
+            Auth.is_patron = is_patron;
             System.out.println("User created successfully");
             return true;
         } catch (Exception e) {
@@ -69,8 +101,10 @@ public class User extends Model{
             statement.setString(2, password);
             ResultSet result = statement.executeQuery();
             if (result.next()) {
+                Auth.id = result.getInt("id");
                 Auth.username = result.getString("username");
                 Auth.email = result.getString("email");
+                Auth.is_patron = result.getBoolean("is_patron");
                 return true;
             }
         } catch (SQLException e) {

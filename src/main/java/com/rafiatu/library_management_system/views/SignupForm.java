@@ -12,11 +12,22 @@ public class SignupForm {
     private JButton signupButton;
     private JTextField email;
     private JPasswordField password;
+
+    public JButton getSignupButton() {
+        return signupButton;
+    }
+
     private JPasswordField password_confirmation;
     private JLabel usernameError;
     private JLabel emailError;
     private JLabel passwordError;
     private JLabel signIn;
+
+    public JLabel getSignIn() {
+        return signIn;
+    }
+
+    private JLabel subText;
     JFrame signUpPage = new JFrame("Sign Up Form");
 
     public SignupForm() {
@@ -25,7 +36,6 @@ public class SignupForm {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (validate()) {
-
                         if (save()) {
                             signUpPage.dispose();
                             (new Dashboard()).show();
@@ -112,6 +122,14 @@ public class SignupForm {
         return true;
     }
 
+    public JLabel getSubText() {
+        return subText;
+    }
+
+    public void setSubText(JLabel subText) {
+        this.subText = subText;
+    }
+
     private boolean save() throws SQLException {
         System.out.println("saving user data");
         User user = new User();
@@ -125,5 +143,18 @@ public class SignupForm {
         if (User.checkForEmail(email.getText())) {
             emailError.setText("Email already exists");
         }
+    }
+
+    public JPanel getFrame() {
+        return frame;
+    }
+
+    public void showPatronForm() {
+        JFrame dashboard = Component.getDashboardLayout();
+        getSubText().setVisible(false);
+        getSignIn().setVisible(false);
+        getSignupButton().setText("Add Patron");
+        dashboard.setContentPane(getFrame());
+
     }
 }
