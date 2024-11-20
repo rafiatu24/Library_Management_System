@@ -82,3 +82,8 @@ Contributions
 
 Contributions are welcome! Feel free to fork the repository, make enhancements, and submit a pull request.
 
+
+Below is the ER diagram of the project
+
+
+![Library_Management_System_ER](https://github.com/user-attachments/assets/6098211b-1cf0-4fb9-93a7-cf67ca956d58)
